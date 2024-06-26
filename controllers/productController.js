@@ -68,23 +68,65 @@ const getProductByCode = async (req, res) => {
 };
 
 const getProductByName = async (req, res) => {
-    let { nombre } = req.params; // Obtener el nombre del producto desde los parámetros de la solicitud
-
     try {
+        // Extract product name from request parameters
+        const { nombre } = req.params;
+        console.log(nombre);
+        console.log(typeof nombre);
 
-        // Buscar el producto por el nombre exacto
+        // Search for the product by exact description (assuming 'DESCRIPCION' is the field in your schema)
         const product = await Product.findOne({ DESCRIPCION: nombre });
 
         if (!product) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        // Si se encuentra el producto, devolverlo en la respuesta
+        // If product found, return it in the response
         res.json(product);
     } catch (err) {
         console.error('Error al buscar producto por nombre:', err);
         res.status(500).json({ error: 'Error del servidor al buscar producto' });
     }
-}
+};
 
-module.exports = { postNewProduct, postMassiveProducts, getProductByCode, getProductByName };
+const getProductsBySimilarName = async (req, res) => {
+    try {
+        const { nombre } = req.params;
+
+        // Verificar si nombre está definido y no es null
+        if (!nombre) {
+            return res.status(400).json({ error: 'Debe proporcionar una descripción para buscar productos similares' });
+        }
+
+        // Realiza la búsqueda en MongoDB usando el índice de texto y el operador $text
+        const products = await Product.find({
+            $search: {
+                index: "default",
+                text: {
+                  query: {nombre},
+                  path: "DESCRIPCION",
+                  fuzzy: {
+                    maxEdits: 2,
+                    prefixLength: 0,
+                    maxExpansions: 50
+                  }
+                }
+              }
+          }, {
+            score: { $meta: "textScore" }
+          }).limit(10);
+        
+
+        if (!products || products.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron productos similares' });
+        }
+
+        res.json(products);
+    } catch (err) {
+        console.error('Error al buscar productos por descripción similar:', err);
+        res.status(500).json({ error: 'Error del servidor al buscar productos' });
+    }
+};
+
+
+module.exports = { postNewProduct, postMassiveProducts, getProductByCode, getProductByName, getProductsBySimilarName };
