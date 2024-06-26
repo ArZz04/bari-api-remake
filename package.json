@@ -1,0 +1,29 @@
+{
+    "dependencies": {
+      "bcrypt": "^5.1.1",
+      "cookie-parser": "^1.4.6",
+      "cors": "^2.8.5",
+      "express": "^4.19.2",
+      "jsonwebtoken": "^9.0.2",
+      "mongoose": "^8.4.1"
+    },
+    "name": "bari-web-remake",
+    "version": "1.0.0",
+    "description": "this is a api to repo \"bari-web-remake\" ",
+    "main": "server.js",
+    "directories": {
+      "test": "tests"
+    },
+    "scripts": {
+      "start": "node --watch server.js",
+      "dev": "node server.js --watch",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "bari-api-remake"
+    },
+    "author": "Juan Arvizu arzzdeveloper04@gmail.com (https://example.com)",
+    "license": "ISC"
+  }
+  
