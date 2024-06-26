@@ -150,4 +150,38 @@ const updateInfoProduct = async (req, res) => {
     }
 };
 
-module.exports = { postNewProduct, postMassiveProducts, getProductByCode, getProductByName, getProductsBySimilarName, updateInfoProduct };
+const updateInfoShortProduct = async (req, res) => {
+    const { codigo } = req.params;
+    const newData = req.body;
+
+    // Verificar si el cuerpo de la solicitud está vacío
+    if (!newData || Object.keys(newData).length === 0) {
+        return res.status(400).json({ error: 'El cuerpo de la solicitud no puede estar vacío' });
+    }
+
+    try {
+        // Buscar el producto por el código
+        let product = await Product.findOne({ CODIGO: codigo });
+
+        if (!product) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        // Actualizar solo los campos específicos proporcionados en newData
+        for (const key in newData) {
+            if (newData.hasOwnProperty(key)) {
+                product[key] = newData[key];
+            }
+        }
+
+        // Guardar el producto actualizado
+        await product.save();
+
+        res.json({ message: 'Producto actualizado correctamente', product });
+    } catch (err) {
+        console.error('Error al actualizar producto por código:', err);
+        res.status(500).json({ error: 'Error del servidor al actualizar el producto' });
+    }
+};
+
+module.exports = { postNewProduct, postMassiveProducts, getProductByCode, getProductByName, getProductsBySimilarName, updateInfoProduct, updateInfoShortProduct };
