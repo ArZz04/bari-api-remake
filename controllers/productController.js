@@ -111,5 +111,43 @@ const getProductsBySimilarName = async (req, res) => {
     }
 };
 
+const updateInfoProduct = async (req, res) => {
+    const { codigo } = req.params;
+    const newData = req.body;
 
-module.exports = { postNewProduct, postMassiveProducts, getProductByCode, getProductByName, getProductsBySimilarName };
+    // Verificar si el cuerpo de la solicitud está vacío
+    if (!newData || Object.keys(newData).length === 0) {
+        return res.status(400).json({ error: 'El cuerpo de la solicitud no puede estar vacío' });
+    }
+
+    try {
+        // Buscar el producto por el código
+
+        const product = await Product.findOne({ CODIGO: codigo });
+
+        if (!product) {
+            return res.status(404).json({ error: 'Producto no encontrado' });
+        }
+
+        // Crear un documento temporal para validar los nuevos datos
+        Object.assign(product, newData);
+        await product.validate();
+
+        // Si la validación es exitosa, actualizar el producto
+        await Product.findOneAndUpdate({ CODIGO: codigo }, newData, { new: true });
+
+        res.json({ message: 'Producto actualizado correctamente', product });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            const errors = {};
+            for (const [field, error] of Object.entries(err.errors)) {
+                errors[field] = error.message;
+            }
+            return res.status(400).json({ error: 'Datos de entrada inválidos', details: errors });
+        }
+        console.error('Error al actualizar producto por código:', err);
+        res.status(500).json({ error: 'Error del servidor al actualizar el producto' });
+    }
+};
+
+module.exports = { postNewProduct, postMassiveProducts, getProductByCode, getProductByName, getProductsBySimilarName, updateInfoProduct };
