@@ -98,24 +98,7 @@ const getProductsBySimilarName = async (req, res) => {
             return res.status(400).json({ error: 'Debe proporcionar una descripción para buscar productos similares' });
         }
 
-        // Realiza la búsqueda en MongoDB usando el índice de texto y el operador $text
-        const products = await Product.find({
-            $search: {
-                index: "default",
-                text: {
-                  query: {nombre},
-                  path: "DESCRIPCION",
-                  fuzzy: {
-                    maxEdits: 2,
-                    prefixLength: 0,
-                    maxExpansions: 50
-                  }
-                }
-              }
-          }, {
-            score: { $meta: "textScore" }
-          }).limit(10);
-        
+        const products = await Product.find({ DESCRIPCION: { $regex: nombre, $options: 'i' } })
 
         if (!products || products.length === 0) {
             return res.status(404).json({ error: 'No se encontraron productos similares' });
