@@ -5,7 +5,8 @@ const {
     getProductByCode, 
     getProductByName, 
     getProductsBySimilarName,
-    updateInfoProduct } = require('../controllers/productController');
+    updateInfoProduct,
+    updateInfoShortProduct} = require('../controllers/productController');
 const router = express.Router();
 
 router.post('/create', postNewProduct);
@@ -16,5 +17,6 @@ router.get('/search/:nombre', getProductByName);
 router.get('/search/similar/:nombre', getProductsBySimilarName);
 
 router.put('/update/:codigo', updateInfoProduct);
+router.put('/update/short/:codigo', updateInfoShortProduct);
 
 module.exports = router;
