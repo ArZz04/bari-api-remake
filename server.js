@@ -10,11 +10,19 @@ const app = express();
 const PORT = 3000;
 
 // Middleware
-app.use(cors());
+
+const originsAllowed = [ 'http://localhost:5173', 'http://192.168.1.3:5173', "http://192.168.56.1:5173" ];
+
+app.use(cors(originsAllowed));
 app.use(express.json()); // Aumenta el límite según tus necesidades
-// app.use(express.json({ limit: '50mb' })); // Aumenta el límite según tus necesidades
+//app.use(express.json({ limit: '50mb' })); // Aumenta el límite según tus necesidades
 
 app.use(cookieParser());
+
+// Single Route
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

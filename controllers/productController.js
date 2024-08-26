@@ -71,8 +71,6 @@ const getProductByName = async (req, res) => {
     try {
         // Extract product name from request parameters
         const { nombre } = req.params;
-        console.log(nombre);
-        console.log(typeof nombre);
 
         // Search for the product by exact description (assuming 'DESCRIPCION' is the field in your schema)
         const product = await Product.findOne({ DESCRIPCION: nombre });
